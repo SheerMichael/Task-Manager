@@ -1,0 +1,145 @@
+{% extends "tasks/base.html" %}
+
+{% block title %}
+    {% if form.instance.id %}Edit Task{% else %}Create Task{% endif %} | Task Manager
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+<style>
+    .form-card {
+        max-width: 800px;
+        margin: 0 auto;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .form-header {
+        background-color: #f8f9fa;
+        border-radius: 15px 15px 0 0;
+        padding: 20px 30px;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-body {
+        padding: 30px;
+    }
+    
+    .form-card:hover {
+        transform: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+    <div class="form-header">
+        <h1 class="h3 mb-0">
+            {% if form.instance.id %}
+                <i class="fas fa-edit me-2"></i>Edit Task
+            {% else %}
+                <i class="fas fa-plus-circle me-2"></i>Create New Task
+            {% endif %}
+        </h1>
+    </div>
+    <div class="form-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label">Task Title</label>
+                <input type="text" class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                       id="{{ form.title.id_for_label }}" name="{{ form.title.html_name }}" 
+                       value="{{ form.title.value|default:'' }}" placeholder="Enter task title">
+                {% if form.title.errors %}
+                <div class="invalid-feedback">
+                    {{ form.title.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                <textarea class="form-control {% if form.description.errors %}is-invalid{% endif %}" 
+                          id="{{ form.description.id_for_label }}" name="{{ form.description.html_name }}" 
+                          rows="4" placeholder="Enter task description">{{ form.description.value|default:'' }}</textarea>
+                {% if form.description.errors %}
+                <div class="invalid-feedback">
+                    {{ form.description.errors.0 }}
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                    <select class="form-select {% if form.status.errors %}is-invalid{% endif %}" 
+                            id="{{ form.status.id_for_label }}" name="{{ form.status.html_name }}">
+                        {% for value, text in form.fields.status.choices %}
+                            <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                                {{ text }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.status.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.status.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.priority.id_for_label }}" class="form-label">Priority</label>
+                    <select class="form-select {% if form.priority.errors %}is-invalid{% endif %}" 
+                            id="{{ form.priority.id_for_label }}" name="{{ form.priority.html_name }}">
+                        {% for value, text in form.fields.priority.choices %}
+                            <option value="{{ value }}" {% if form.priority.value == value %}selected{% endif %}>
+                                {{ text }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.priority.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.priority.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>
+                    <input type="text" class="form-control datepicker {% if form.due_date.errors %}is-invalid{% endif %}" 
+                           id="{{ form.due_date.id_for_label }}" name="{{ form.due_date.html_name }}" 
+                           value="{{ form.due_date.value|date:'Y-m-d'|default:'' }}" placeholder="Select date">
+                    {% if form.due_date.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.due_date.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'task_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>
+                    {% if form.instance.id %}Update Task{% else %}Create Task{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr('.datepicker', {
+            dateFormat: 'Y-m-d',
+            minDate: 'today'
+        });
+    });
+</script>
+{% endblock %}
